@@ -1,0 +1,173 @@
+sudo /usr/bin/vmhgfs-fuse .host:/ /mnt/hgfs -o subtype=vmhgfs-fuse,allow_other
+cd /mnt/hgfs/lab_hive
+lab_hive
+su hadoopthanhphuong
+start-all.sh
+hive
+/home/hadoopthanhphuong/demo/
+
+DROP TABLE viewed_movies;
+
+CREATE TABLE viewed_movies (
+host STRING,
+movie STRING)
+PARTITIONED BY (dt string, country string)
+CLUSTERED BY(movie) INTO 64 BUCKETS
+STORED AS SEQUENCEFILE;
+
+ADD JAR /mnt/hgfs/lab_hive/demo_lab.jar;
+
+
+ADD JAR /mnt/hgfs/lab_hive/lib/geoip-1.2.5.jar;
+ADD JAR /mnt/hgfs/lab_hive/lib/hadoop-common-2.6.0.jar;
+ADD JAR /mnt/hgfs/lab_hive/lib/hive-common-0.7.1-cdh3u2.jar;
+ADD JAR /mnt/hgfs/lab_hive/lib/hive-exec-0.7.1-cdh3u2.jar;
+ADD JAR /mnt/hgfs/lab_hive/lib/hive-metastore-0.7.1-cdh3u2.jar;
+ADD JAR /mnt/hgfs/lab_hive/lib/hive-serde-0.7.1-cdh3u2.jar;
+
+ADD file /mnt/hgfs/lab_hive/GeoIP.dat;
+
+ADD jar /home/hadoopthanhphuong/demo_lab/ExtractMovieUDF.jar;
+ADD jar /home/hadoopthanhphuong/demo_lab/GeolocUDF.jar;
+
+ADD jar /home/hadoopthanhphuong/demo_lab/ExtractMovieUDF.jar;
+ADD jar /home/hadoopthanhphuong/demo_lab/GeolocUDF.jar;
+
+
+
+
+
+ADD file /mnt/hgfs/lab_hive/GeoIP.dat;
+CREATE temporary function movie_udf AS 'demo.lab.ExtractMovieUDF';
+CREATE temporary function country_udf AS 'demo.lab.GeolocUDF';
+
+
+INSERT OVERWRITE TABLE viewed_movies
+PARTITION (dt='2022-06-10', country)
+SELECT host, movie_udf(request),
+country_udf(host, "GeoIP.dat")
+FROM access_log ;
+
+SELECT * FROM access_log ;
+SELECT host, request FROM access_log ;
+SELECT * FROM viewed_movies;
+
+
+SHOW PARTITIONS viewed_movies;
+hadoop fs -ls  /user/hive/warehouse/viewed_movies/dt=2022-06-10/country=US
+hadoop fs -ls  /user/hive/warehouse/viewed_movies/dt=2022-06-10
+
+
+
+/////////////////////////////////////
+
+////////////////////////////////////
+logs-simple.txt
+hive-movie-categories.txt
+hive-log.txt
+logs-user-simple.txt
+viewed_movies
+logs_20120101
+
+
+
+
+SELECT * FROM access_log ;
+SELECT host, request FROM access_log ;
+SELECT * FROM viewed_movies;
+
+CREATE TABLE access_log (host STRING,identity STRING,`user` STRING,`time` STRING,request STRING,status STRING,size STRING)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'
+WITH SERDEPROPERTIES (
+"input.regex" = 
+"([^ ]*) ([^ ]*) ([^ ]*) (-|\\[[^\\]]*\\]) ([^ \"]*|\"[^\"]*\") (-|[0-9]*) (-|[0-9]*)",
+"output.format.string"="%1$s %2$s %3$s %4$s %5$s %6$s %7$s"
+)
+SELECT * FROM viewed_movies;
+SELECT host, movie  FROM viewed_movies TABLESAMPLE(1 PERCENT);
+
+
+
+LOAD DATA LOCAL INPATH '/home/hadoopthanhphuong/demo_lab/ExtractMovieUDF.jar' INTO TABLE access_log ;
+
+INSERT OVERWRITE TABLE viewed_movies
+PARTITION (dt='2022-06-10', country)
+SELECT host, movie_udf(request),
+country_udf(host, "GeoIP.dat")
+FROM access_log ;
+SHOW PARTITIONS viewed_movies;
+set hive.enforce.bucketing = true ;
+
+set hive.enforce.bucketing = true ;
+
+SELECT * FROM viewed_movies
+TABLESAMPLE(BUCKET 1 OUT OF 64 ON movie);
+SELECT * FROM viewed_movies
+TABLESAMPLE(BUCKET 1 OUT OF 64 ON rand());
+'US') ;
+
+
+
+
+ADD jar /home/hadoopthanhphuong/demo_lab/ExtractMovieUDF.jar;
+ADD jar /home/hadoopthanhphuong/demo_lab/GeolocUDF.jar;
+demo.lab ;
+
+
+ADD file /mnt/hgfs/lab_hive/GeoIP.dat;
+CREATE temporary function country_udf AS 'demo.lab.GeolocUDF';
+CREATE temporary function movie_udf AS 'demo.lab.ExtractMovieUDF';
+SET hive.exec.dynamic.partition=true;
+SET hive.enforce.bucketing = true;
+
+SELECT * FROM access_log ;
+set hive.exec.reducers.bytes.per.reducer=5;
+set hive.exec.reducers.max=5;
+set mapreduce.job.reduces=5 ;
+
+
+
+hadoop fs -ls  /user/hive/warehouse/viewed_movies/dt=2022-06-10/country=US 
+
+
+hive-common-1.1.0-cdh5.12.0.jar
+java.lang.RunTimeException error caching map.xml
+set hive.auto.convert.join = false
+execution error return code 2 from org.apache.hadoop.hive.ql.mr.MapRedTask error caching map.xml
+
+set hive.auto.convert.join.noconditionaltask=false;
+set hive.exec.mode.local.auto=false
+SET mapred.reduce.tasks=1;
+SET mapreduce.job.reduces=1;
+SET hive.auto.convert.join=false;
+
+Đối với tôi, đó là do hàng đợi không được thiết lập.
+
+set mapred.job.queue.name=1;
+set mapreduce.job.reduces=1;
+
+SET hive.execution.engine=tez;
+set map.reduce.tasks = 22;
+
+set hive.enforce.bucketing = true;
+
+SET hive.auto.convert.join=true; --default false
+SET hive.optimize.bucketmapjoin=true; --default false
+
+SET hive.auto.convert.join=true; --default false
+SET hive.mapjoin.smalltable.filesize=600000000; --default 25M
+SET hive.auto.convert.join.noconditionaltask=true; --default false. Set to true so that map join hint is not needed
+SET hive.auto.convert.join.noconditionaltask.size=10000000;
+
+SET hive.input.format=org.apache.hadoop.hive.ql.io.BucketizedHiveInputFormat
+SET hive.auto.convert.sortmerge.join=true;
+SET hive.optimize.bucketmapjoin=true;
+SET hive.optimize.bucketmapjoin.sortedmerge=true;
+SET hive.auto.convert.sortmerge.join.noconditionaltask=true;
+
+SET hive.auto.convert.join=true;
+SET hive.auto.convert.sortmerge.join=true
+SET hive.optimize.bucketmapjoin=true;
+SET hive.optimize.bucketmapjoin.sortedmerge=true;
+SET hive.auto.convert.sortmerge.join.noconditionaltask=true;
+SET hive.auto.convert.sortmerge.join.bigtable.selection.policy=org.apache.hadoop.hive.ql.optimizer.TableSizeBasedBigTableSelectorForAutoSMJ;
